@@ -1,6 +1,6 @@
 export const player = {
-    x:4,
-    y:4,
+    x:9,
+    y:6,
     char: 'V',
     inventory: []
 };

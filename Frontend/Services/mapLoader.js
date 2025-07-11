@@ -9,6 +9,8 @@ export async function loadMap(path) {
     tiles = raw.tiles;
   }
 
+  console.log(`Loaded map size ${tiles.length} rows x ${tiles[0].length} cols`);
+
   return {
     tiles,
     width: tiles[0].length,

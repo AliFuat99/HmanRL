@@ -1,27 +1,31 @@
-import * as ROT from 'https://unpkg.com/rot-js@2.2.1/lib/index.js';
+// services/fov.js
+export function computeFOV(player, mapData, radius = 12) {
+  const visible = new Set();
 
-export function createFOV(mapData) {
-  const isOpaque = (x, y) => {
-    if (x < 0 || y < 0 || y >= mapData.height || x >= mapData.width) return true;
-    const row = mapData.tiles[y];
-    if (!row) return true;
-    const tile = row[x];
-    if (!tile) return true;
-    return tile === '#';
-  };
+  // self
+  visible.add(`${player.x},${player.y}`);
 
-  // ROT.FOV.DiscreteShadowcasting ile deneyelim
-  return new ROT.FOV.DiscreteShadowcasting(isOpaque);
-}
+  // kaç derecelik adımla ışın atacağız (küçük adım = daha düzgün daire)
+  const stepDeg = 2; // 2° aralıklarla → 180 ışın
+  for (let deg = 0; deg < 360; deg += stepDeg) {
+    const rad = deg * Math.PI / 180;
+    // her ışın için radius kadar ilerle
+    for (let r = 1; r <= radius; r++) {
+      const x = Math.round(player.x + Math.cos(rad) * r);
+      const y = Math.round(player.y + Math.sin(rad) * r);
 
-export function computeFOV(player, mapData, radius = 10) {
-  const fov = createFOV(mapData);
-  const visibleTiles = new Set();
+      if (x < 0 || y < 0 || x >= mapData.width || y >= mapData.height) {
+        break; // sınır dışı, bu ışını sonlandır
+      }
 
-  fov.compute(player.x, player.y, radius, (x, y) => {
-    console.log(`Visible tile: ${x},${y}`); // debug amaçlı
-    visibleTiles.add(`${x},${y}`);
-  });
+      visible.add(`${x},${y}`);
 
-  return visibleTiles;
+      // duvara çarptıysa arkayı görme, bu ışını bitir
+      if (mapData.tiles[y][x] === '#') {
+        break;
+      }
+    }
+  }
+
+  return visible;
 }
