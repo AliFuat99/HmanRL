@@ -2,11 +2,21 @@ import { loadMap } from './services/mapLoader.js';
 import { render } from './Services/renderer.js';
 import { player } from './models/player.js';
 import { pickupItemIfExists } from './services/itemSystem.js';
+import { computeFOV } from './Services/fov.js';
+
 
 let mapData = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
   mapData = await loadMap('./Maps/Level1/Lvl1Present.json');
+console.log('merhaba')
+console.log('Player position:', player.x, player.y);
+console.log('Tile at player:', mapData.tiles[player.y]?.[player.x]);
+const visible = computeFOV(player, mapData, 8);
+console.log('Visible tiles count:', visible.size);
+console.log('Visible tiles sample:', [...visible].slice(0, 10));
+
+
   render(mapData, player);
 });
 
