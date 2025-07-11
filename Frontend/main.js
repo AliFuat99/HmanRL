@@ -1,15 +1,33 @@
-import { BaseStats } from './config/baseStats.js';
-import { PlayerStats } from '/models/PlayerStats.js'; // Küçük harfli klasör ismi
-// Eğer varsa: import { PlayerService } from './services/PlayerService.js';
+import { loadMap } from './services/mapLoader.js';
+import { render } from './Services/renderer.js';
+import { player } from './models/player.js';
+import { pickupItemIfExists } from './services/itemSystem.js';
 
-const player = new PlayerStats(BaseStats);
+let mapData = null;
 
-console.log('Starting Stats:', player);
+document.addEventListener('DOMContentLoaded', async () => {
+  mapData = await loadMap('./Maps/Level1/Lvl1Present.json');
+  render(mapData, player);
+});
 
-player.updateStats({ strength: 5, constitution: 4, intelligence: 3, wisdom: 5 });
-console.log('Updated Stats :', player);
+document.addEventListener('keydown', (e) => {
+  const dirs = {
+    ArrowUp:    [0, -1],
+    ArrowDown:  [0, 1],
+    ArrowLeft:  [-1, 0],
+    ArrowRight: [1, 0]
+  };
 
+  if (!dirs[e.key]) return;
 
-player.gainXP(100);
-console.log('100 xp added the current level is :', player.level)
-console.log('and the new stats are :', player)
+  const [dx, dy] = dirs[e.key];
+  const nx = player.x + dx;
+  const ny = player.y + dy;
+
+  if (mapData.tiles[ny]?.[nx] === '.') {
+    player.x = nx;
+    player.y = ny;
+    pickupItemIfExists(nx, ny);
+    render(mapData, player);
+  }
+});

@@ -33,3 +33,26 @@ body {
   color: #7fff00;
   border: 5px solid var(--clr-accent);
 }
+
+#inventory-panel {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 5 sütunluk envanter */
+  gap: 6px;
+  padding: 6px;
+  background-color: #000;
+}
+
+.inventory-slot {
+  width: 48px;
+  height: 32px;
+  background-color: #222;
+  color: #7fff00;
+  font-family: Consolas;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #7fff00;
+}
+
+

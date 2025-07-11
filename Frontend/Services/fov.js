@@ -1,0 +1,18 @@
+import * as ROT from 'https://unpkg.com/rot-js@2.2.1/lib/index.js';
+
+export function createFOV(mapData) {
+  const isOpaque = (x, y) => {
+    if (x < 0 || y < 0 || y >= mapData.height || x >= mapData.width) return true;
+    return mapData.tiles[y][x] === '#';
+  };
+  return new ROT.FOV.PreciseShadowcasting(isOpaque);
+}
+
+export function computeFOV(player, mapData, radius = 8) {
+  const fov = createFOV(mapData);
+  const visibleTiles = new Set();
+  fov.compute(player.x, player.y, radius, (x, y) => {
+    visibleTiles.add(`${x},${y}`);
+  });
+  return visibleTiles;
+}
