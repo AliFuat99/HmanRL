@@ -1,4 +1,4 @@
-import { items } from '../models/items.js';
+import { items } from '../models/items.js';  // Eğer items kullanıyorsan
 
 export function render(mapData, player, visible) {
   const gameContainer = document.querySelector('.item-2');
@@ -7,25 +7,23 @@ export function render(mapData, player, visible) {
   const startX = Math.max(0, Math.min(player.x - halfW, mapData.width - viewW));
   const startY = Math.max(0, Math.min(player.y - halfH, mapData.height - viewH));
 
-  const lines = [];
+  let html = '';
   for (let y = startY; y < startY + viewH; y++) {
-    let row = '';
     for (let x = startX; x < startX + viewW; x++) {
       const key = `${x},${y}`;
       if (!visible.has(key)) {
-        row += ' ';
+        html += '<span class="cell empty"></span>';
       } else if (x === player.x && y === player.y) {
-        row += player.char || '@';
+        html += '<span class="cell player">' + (player.char||'@') + '</span>';
       } else if (mapData.tiles[y][x] === '#') {
-        row += '#';     // Duvar
+        html += '<span class="cell wall">#</span>';
       } else {
-        // Zemin veya eşya
         const it = items.find(i => i.x === x && i.y === y);
-        row += it ? it.char : mapData.tiles[y][x] || '.';
+        const ch = it ? it.char : '.';
+        html += `<span class="cell floor">${ch}</span>`;
       }
     }
-    lines.push(row);
+    html += '<br>';
   }
-
-  gameContainer.textContent = lines.join('\n');
+  gameContainer.innerHTML = html;
 }

@@ -1,19 +1,24 @@
-export async function loadMap(path) {
-  const res = await fetch(path);
-  const raw = await res.json();
+export async function loadMap(url) {
+  const resp = await fetch(url);
+  const raw = await resp.json();
 
-  let tiles;
-  if (typeof raw.tiles[0] === 'string') {
-    tiles = raw.tiles.map(row => row.split(''));
-  } else {
-    tiles = raw.tiles;
-  }
+  // Harita satırlarını diziye al
+  const rows = raw.tiles;
 
-  console.log(`Loaded map size ${tiles.length} rows x ${tiles[0].length} cols`);
+  // Tüm satırların uzunluğunu bul
+  const maxLength = Math.max(...rows.map(r => r.length));
+
+  // Satırları maxLength kadar doldur
+  const tiles = rows.map(r => {
+    if (r.length < maxLength) {
+      return r.padEnd(maxLength, '.'); // boş alanlarla doldur
+    }
+    return r;
+  });
 
   return {
-    tiles,
-    width: tiles[0].length,
+    tiles: tiles.map(r => r.split('')), // karakter diziye çevir
+    width: maxLength,
     height: tiles.length
   };
 }
